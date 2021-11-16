@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form>
+        <input type="text" name="title" placeholder="title">
+        <input type="text" name="type" placeholder="type">
+        <input type="text" name="tags" placeholder="tags">
+        <input type="text" name="text" placeholder="text">
+        <input type="text" name="grade" placeholder="grade">
+        <input type="file" name="images" accept="image/*" multiple>
+        <button>Send</button>
+    </form>
+
+    <script>
+        const form = document.querySelector('form');
+        const inputFile = document.querySelector('input[name="images"]');
+        let images = [];
+
+        const changeFile = (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onloadend = (e) => {
+                    images.push(e.target.result);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        const handleSubmit = async(e) => {
+            e.preventDefault();
+            console.log(images);
+            await fetch('http://127.0.0.1:8000/overviews', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: form.title.value,
+                        type: form.type.value,
+                        tags: form.tags.value.split(','),
+                        text: form.text.value,
+                        grade: form.grade.value,
+                        images: images,
+                        dateTime: new Date()
+                    })
+                }).then(resp => resp.json())
+                .then(resp => console.log(resp))
+                .catch(err => console.log(err))
+        }
+
+        inputFile.addEventListener('change', changeFile);
+        form.addEventListener('submit', handleSubmit);
+
+
+        const getData = async() => {
+            await fetch('http://127.0.0.1:8000/overviews')
+                .then(resp => resp.json())
+                .then(resp => console.log(resp))
+        }
+
+        getData();
+    </script>
+
+</body>
+
+</html>
