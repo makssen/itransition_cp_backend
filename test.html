@@ -47,7 +47,8 @@
             await fetch('http://127.0.0.1:8000/overviews', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1ha3Muc2VuLjE5MDNAbWFpbC5ydSIsInVzZXJuYW1lIjoiTWFrc2ltIFNlbmtldmljaCIsImV4cCI6MTYzNzIzMzc0OH0.yxt3Ih4djA814IoR9DtShCjFc6nHCOSCtMY7Rt72f8k'
                     },
                     body: JSON.stringify({
                         title: form.title.value,

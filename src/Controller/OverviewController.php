@@ -6,6 +6,8 @@ use App\Entity\Overview;
 use App\Entity\Tag;
 use App\Form\OverviewType;
 use Cloudinary;
+use Exception;
+use Firebase\JWT\JWT;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -35,33 +37,44 @@ class OverviewController extends AbstractApiController
     #[Route('/overviews', methods: ['POST'])]
     public function create(Request $request): Response
     {
-        $form = $this->buildForm(OverviewType::class);
+        $jwt = $request->headers->get('authorization');
 
-        $form->handleRequest($request);
+        if ($jwt) {
+            try {
+                $decoded = JWT::decode($jwt, $this->getParameter('jwt_secret'), array('HS256'));
+                $form = $this->buildForm(OverviewType::class);
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->respond($form, Response::HTTP_BAD_REQUEST);
-        }
+                $form->handleRequest($request);
 
-        $overview = $form->getData();
-        $images = Cloudinary::getImage($form['images']->getData());
-        $overview->setImages($images);
-        $tags = $form['tags']->getData();
+                if (!$form->isSubmitted() || !$form->isValid()) {
+                    return $this->respond($form, Response::HTTP_BAD_REQUEST);
+                }
 
-        foreach ($tags as $value) {
-            $tag = $this->getDoctrine()->getRepository(Tag::class)->findOneBy(['text' => $value]);
-            if (!$tag) {
-                $entityManager = $this->getDoctrine()->getManager();
-                $newTag = (new Tag())->setText($value);
-                $entityManager->persist($newTag);
-                $entityManager->flush();
+                $overview = $form->getData();
+                $images = Cloudinary::getImage($form['images']->getData());
+                $overview->setImages($images);
+                $tags = $form['tags']->getData();
+
+                foreach ($tags as $value) {
+                    $tag = $this->getDoctrine()->getRepository(Tag::class)->findOneBy(['text' => $value]);
+                    if (!$tag) {
+                        $entityManager = $this->getDoctrine()->getManager();
+                        $newTag = (new Tag())->setText($value);
+                        $entityManager->persist($newTag);
+                        $entityManager->flush();
+                    }
+                }
+
+                $this->getDoctrine()->getManager()->persist($overview);
+                $this->getDoctrine()->getManager()->flush();
+
+                return $this->respond($overview);
+            } catch (Exception $e) {
+                return $this->respond(['message' => $e->getMessage()]);
             }
+        } else {
+            return $this->respond(['message' => 'Access closed']);
         }
-
-        $this->getDoctrine()->getManager()->persist($overview);
-        $this->getDoctrine()->getManager()->flush();
-
-        return $this->respond($overview);
     }
 
     #[Route('/overviews/{id}', methods: ['POST'])]
