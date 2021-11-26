@@ -69,12 +69,15 @@
 
 
         const getData = async() => {
-            await fetch('http://127.0.0.1:8000/overviews')
-                .then(resp => resp.json())
-                .then(resp => console.log(resp))
+            try {
+                const response = await fetch('https://jsonlaceholder.typicode.com/posts');
+                return response.json();
+            } catch (error) {
+                console.log(error);
+            }
         }
 
-        getData();
+        getData().then(resp => console.log(resp));
     </script>
 
 </body>

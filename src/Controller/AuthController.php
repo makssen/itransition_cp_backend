@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use CustomError;
+use Exception;
 use Firebase\JWT\JWT;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,9 @@ class AuthController extends AbstractApiController
         }
 
         $getUser = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $request->get('email')]);
-        if ($getUser) return $this->respond(CustomError::UnauthorizedError('Such email already exists'));
+        if ($getUser) {
+            return $this->respond(['message' => 'User already exists'], Response::HTTP_UNAUTHORIZED);
+        };
 
         $user = $form->getData();
         $password = $user->getPassword();
@@ -34,6 +36,16 @@ class AuthController extends AbstractApiController
 
         $this->getDoctrine()->getManager()->persist($user);
         $this->getDoctrine()->getManager()->flush();
+
+        $payload = [
+            "email" => $user->getEmail(),
+            "username" => $user->getUsername(),
+            "role" => $user->getRoles(),
+            "exp"  => (new \DateTime())->modify("+3 minutes")->getTimestamp(),
+        ];
+
+        $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
+        return $this->respond(['token' => $jwt]);
 
         return $this->respond($user);
     }
@@ -44,20 +56,51 @@ class AuthController extends AbstractApiController
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $request->get('email')]);
         $userPassword = $passwordHasher->isPasswordValid($user, $request->get('password'));
 
-        if (!$user || !$userPassword) {
-            return $this->respond(CustomError::UnauthorizedError('Email or password is wrong'));
+        if (!$user) {
+            return $this->respond(['message' => 'auth/email-not-found'], Response::HTTP_UNAUTHORIZED);
+        } else {
+            $userPassword = $passwordHasher->isPasswordValid($user, $request->get('password'));
+            if (!$userPassword) {
+                return $this->respond(['message' => 'auth/password-wrong'], Response::HTTP_UNAUTHORIZED);
+            }
         }
 
         $payload = [
             "email" => $user->getEmail(),
             "username" => $user->getUsername(),
+            "role" => $user->getRoles(),
             "exp"  => (new \DateTime())->modify("+3 minutes")->getTimestamp(),
         ];
 
         $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
-        return $this->respond([
-            'message' => 'Success!',
-            'token' => $jwt
-        ]);
+        return $this->respond(['token' => $jwt]);
+    }
+
+    #[Route('/auth/check', methods: ['GET'])]
+    public function check(Request $request): Response
+    {
+        $jwt = $request->headers->get('authorization');
+
+        if ($jwt) {
+            try {
+                $decoded = JWT::decode($jwt, $this->getParameter('jwt_secret'), array('HS256'));
+
+                $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $decoded->email]);
+
+                if ($user) {
+                    $payload = [
+                        "email" => $user->getEmail(),
+                        "username" => $user->getUsername(),
+                        "role" => $user->getRoles(),
+                        "exp"  => (new \DateTime())->modify("+3 minutes")->getTimestamp(),
+                    ];
+
+                    $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
+                    return $this->respond(['token' => $jwt]);
+                }
+            } catch (Exception $e) {
+                return $this->respond(['message' => $e->getMessage()]);
+            }
+        }
     }
 }
