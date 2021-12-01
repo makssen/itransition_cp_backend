@@ -23,6 +23,13 @@ class OverviewController extends AbstractApiController
         return $this->respond($overviews);
     }
 
+    #[Route('/overviews/search', methods: ['GET'])]
+    public function search(Request $request): Response
+    {
+        $overviews = $this->getDoctrine()->getRepository(Overview::class)->findBy(['title' => $request->get('q')]);
+        return $this->respond($overviews);
+    }
+
     #[Route('/overviews/{id}', methods: ['GET'])]
     public function getById(Request $request): Response
     {

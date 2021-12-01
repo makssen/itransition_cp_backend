@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -40,6 +42,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $username;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Overview::class, mappedBy="user_id")
+     */
+    private $overviews;
+
+    public function __construct()
+    {
+        $this->overviews = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -133,6 +145,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Overview[]
+     */
+    public function getOverviews(): Collection
+    {
+        return $this->overviews;
+    }
+
+    public function addOverview(Overview $overview): self
+    {
+        if (!$this->overviews->contains($overview)) {
+            $this->overviews[] = $overview;
+            $overview->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOverview(Overview $overview): self
+    {
+        if ($this->overviews->removeElement($overview)) {
+            // set the owning side to null (unless already changed)
+            if ($overview->getUserId() === $this) {
+                $overview->setUserId(null);
+            }
+        }
 
         return $this;
     }

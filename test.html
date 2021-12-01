@@ -48,7 +48,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1ha3Muc2VuLjE5MDNAbWFpbC5ydSIsInVzZXJuYW1lIjoiTWFrc2ltIFNlbmtldmljaCIsImV4cCI6MTYzNzIzMzc0OH0.yxt3Ih4djA814IoR9DtShCjFc6nHCOSCtMY7Rt72f8k'
+                        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1ha3Muc2VuQG1haWwuY29tIiwidXNlcm5hbWUiOiJNYWtzIiwicm9sZSI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNjM4MzkxMTE4fQ.cOLDSZpQOksi7jXb7Vk0SsEH5m8oL2M3umrjwtl5PV0'
                     },
                     body: JSON.stringify({
                         title: form.title.value,
@@ -57,7 +57,8 @@
                         text: form.text.value,
                         grade: form.grade.value,
                         images: images,
-                        dateTime: new Date()
+                        dateTime: new Date(),
+                        user_id: 1
                     })
                 }).then(resp => resp.json())
                 .then(resp => console.log(resp))

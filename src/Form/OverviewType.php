@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Overview;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -53,6 +55,12 @@ class OverviewType extends AbstractType
             ])
             ->add('dateTime', DateTimeType::class, [
                 'widget' => 'single_text',
+                'constraints' => [
+                    new NotNull(),
+                ]
+            ])
+            ->add('user_id', EntityType::class, [
+                'class' => User::class,
                 'constraints' => [
                     new NotNull(),
                 ]
