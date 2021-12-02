@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services;
+
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Configuration\Configuration;
 
