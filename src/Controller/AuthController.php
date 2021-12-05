@@ -55,7 +55,6 @@ class AuthController extends AbstractApiController
     public function login(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $request->get('email')]);
-        $userPassword = $passwordHasher->isPasswordValid($user, $request->get('password'));
 
         if (!$user) {
             return $this->respond(['message' => 'auth/email-not-found'], Response::HTTP_UNAUTHORIZED);
