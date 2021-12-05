@@ -38,10 +38,11 @@ class AuthController extends AbstractApiController
         $this->getDoctrine()->getManager()->flush();
 
         $payload = [
+            "id" => $user->getId(),
             "email" => $user->getEmail(),
             "username" => $user->getUsername(),
             "role" => $user->getRoles(),
-            "exp"  => (new \DateTime())->modify("+3 minutes")->getTimestamp(),
+            "exp"  => (new \DateTime())->modify("+7 days")->getTimestamp(),
         ];
 
         $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
@@ -66,10 +67,11 @@ class AuthController extends AbstractApiController
         }
 
         $payload = [
+            "id" => $user->getId(),
             "email" => $user->getEmail(),
             "username" => $user->getUsername(),
             "role" => $user->getRoles(),
-            "exp"  => (new \DateTime())->modify("+3 minutes")->getTimestamp(),
+            "exp"  => (new \DateTime())->modify("+7 days")->getTimestamp(),
         ];
 
         $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
@@ -89,10 +91,11 @@ class AuthController extends AbstractApiController
 
                 if ($user) {
                     $payload = [
+                        "id" => $user->getId(),
                         "email" => $user->getEmail(),
                         "username" => $user->getUsername(),
                         "role" => $user->getRoles(),
-                        "exp"  => (new \DateTime())->modify("+3 minutes")->getTimestamp(),
+                        "exp"  => (new \DateTime())->modify("+7 days")->getTimestamp(),
                     ];
 
                     $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
