@@ -48,7 +48,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1ha3Muc2VuQG1haWwuY29tIiwidXNlcm5hbWUiOiJNYWtzIiwicm9sZSI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNjM4MzkxMTE4fQ.cOLDSZpQOksi7jXb7Vk0SsEH5m8oL2M3umrjwtl5PV0'
+                        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1ha2Uuc2VuQG1haWwuY29tIiwidXNlcm5hbWUiOiJNYWtzIiwicm9sZSI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNjM4Njk0NDIzfQ.RI6qr2tSiTcsbz_NaP6oWdyGVYH1YHBgZmdkzv9w8cI'
                     },
                     body: JSON.stringify({
                         title: form.title.value,
@@ -67,18 +67,6 @@
 
         inputFile.addEventListener('change', changeFile);
         form.addEventListener('submit', handleSubmit);
-
-
-        const getData = async() => {
-            try {
-                const response = await fetch('https://jsonlaceholder.typicode.com/posts');
-                return response.json();
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        getData().then(resp => console.log(resp));
     </script>
 
 </body>

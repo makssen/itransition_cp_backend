@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Overview;
 use App\Entity\Tag;
 use App\Form\OverviewType;
-use Cloudinary;
+use App\Services\Cloudinary;
 use Exception;
 use Firebase\JWT\JWT;
 use Symfony\Component\HttpFoundation\Request;
