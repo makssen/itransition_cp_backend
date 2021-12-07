@@ -84,7 +84,7 @@ class OverviewController extends AbstractApiController
         }
     }
 
-    #[Route('/overviews/{id}', methods: ['POST'])]
+    #[Route('/overviews/{id}', methods: ['PUT'])]
     public function update(Request $request): Response
     {
         $overviewId = $request->get('id');
@@ -93,7 +93,9 @@ class OverviewController extends AbstractApiController
             throw new NotFoundHttpException('Overview not found');
         }
 
-        $form = $this->buildForm(OverviewType::class, $overview);
+        $form = $this->buildForm(OverviewType::class, $overview, [
+            'method' => $request->getMethod(),
+        ]);
 
         $form->handleRequest($request);
 
